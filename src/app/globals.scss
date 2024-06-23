@@ -1,0 +1,51 @@
+html {
+  @media (width < 740px) {
+    font-size: 56.25%;
+  }
+  @media (740px <= width) {
+    font-size: 62.5%;
+  }
+}
+
+body {
+  font-weight: 500;
+}
+
+* {
+  outline: none;
+}
+
+a {
+  color: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+button {
+  color: inherit;
+}
+
+canvas,
+img,
+picture,
+svg,
+video {
+  background-repeat: no-repeat;
+  background-size: cover;
+  font-style: italic;
+  height: auto;
+  max-width: 100%;
+  pointer-events: none;
+  shape-margin: 1rem;
+  vertical-align: middle;
+}
+
+input,
+textarea {
+  min-width: 0;
+}
+
+ol,
+ul {
+  list-style: none;
+}

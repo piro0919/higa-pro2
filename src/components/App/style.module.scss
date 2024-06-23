@@ -1,0 +1,237 @@
+/* stylelint-disable-next-line plugin/sass-render-errors */
+@import "@/styles/mixin";
+
+.article {
+  background-repeat: repeat;
+  color: rgba(#fff, 0.25);
+  display: flex;
+  justify-content: center;
+  padding: 90px 0 120px;
+
+  .inner {
+    width: min(1280px, 100%);
+  }
+
+  .h2 {
+    color: #fff;
+    filter: drop-shadow(6px 0 rgba(#063f5c, 0.75));
+    font-size: 12rem;
+    font-weight: 500;
+    line-height: 0.7;
+  }
+
+  .content {
+    backdrop-filter: blur(1px);
+    border-radius: 0 24px;
+    @include border-animation;
+  }
+}
+
+.article[data-article="about"] {
+  background-color: #ff7372;
+
+  .content {
+    background-color: rgba(#ffcdcd, 0.75);
+    color: #063f5c;
+    font-size: 2.1rem;
+    line-height: 2;
+    padding: 90px 60px;
+    text-align: center;
+  }
+}
+
+.article[data-article="news"] {
+  background-color: #fed200;
+
+  .content {
+    background-color: rgba(#f7ff99, 0.75);
+    padding: 60px;
+  }
+
+  .list {
+    border-top: 1px solid #063f5c;
+  }
+
+  .item {
+    border-bottom: 1px solid #063f5c;
+    color: #063f5c;
+    display: flex;
+    font-size: 1.8rem;
+    gap: 60px;
+    padding: 18px 0;
+  }
+}
+
+.article[data-article="talent"] {
+  background-color: #57e650;
+
+  .content {
+    background-color: rgba(#baffc0, 0.75);
+  }
+}
+
+.article[data-article="manager"] {
+  background-color: #6777ff;
+
+  .content {
+    background-color: rgba(#b2baff, 0.75);
+  }
+}
+
+@keyframes grid-animation {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: -25px -25px;
+  }
+}
+
+.article[data-article="talent"],
+.article[data-article="manager"] {
+  .content {
+    display: grid;
+    gap: 30px;
+    padding: 60px;
+  }
+
+  .list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .item {
+    background-color: #063f5c;
+    background-repeat: repeat;
+    border: 2px solid #fff;
+    border-radius: 50dvmax;
+    color: rgba(#fff, 0.25);
+    padding: 3px 12px;
+  }
+
+  .link {
+    color: #fff;
+    font-size: 1.5rem;
+  }
+
+  .list2 {
+    display: grid;
+    gap: 48px 24px;
+    grid-template: auto/repeat(4, 1fr);
+  }
+
+  .item2 {
+    animation: grid-animation 1s infinite linear;
+    aspect-ratio: 9/16;
+    background-color: rgba(0, 0, 0, 0.125);
+    background-repeat: repeat;
+    border-radius: 0 24px;
+    color: hsla(0, 0%, 100%, 0.5);
+    position: relative;
+  }
+
+  .name,
+  .furigana {
+    color: #fff;
+    filter: drop-shadow(3px 3px rgba(#063f5c, 0.5));
+    // font-family: arial, sans-serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    padding: 12px 0;
+    position: absolute;
+    writing-mode: vertical-rl;
+  }
+
+  .name {
+    inset: 0 auto auto 0;
+  }
+
+  .imageWrapper {
+    height: 112%;
+    position: absolute;
+    top: -6%;
+    width: 100%;
+  }
+
+  .imageWrapper2 {
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .image {
+    filter: drop-shadow(6px 6px rgba(6, 63, 92, 0.75));
+    height: 96% !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%);
+    width: auto !important;
+  }
+
+  .furigana {
+    inset: auto 0 0 auto;
+  }
+}
+
+.article[data-article="contact"] {
+  background-color: #f89af0;
+
+  .content {
+    background-color: rgba(#ffa1f7, 0.75);
+    padding: 60px;
+  }
+
+  .inner {
+    display: grid;
+    gap: 24px;
+  }
+
+  .field {
+    display: grid;
+    gap: 6px;
+  }
+
+  .label {
+    color: #063f5c;
+    font-size: 1.8rem;
+  }
+
+  .input,
+  .textarea {
+    background: #fff;
+    color: #063f5c;
+    font-family: arial, sans-serif;
+    font-size: 1.5rem;
+    line-height: 1.5;
+    padding: 12px;
+  }
+
+  .error {
+    color: #ca0015;
+    font-size: 1.5rem;
+  }
+
+  .buttonWrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 48px;
+  }
+
+  .button {
+    backdrop-filter: blur(1px);
+    background-color: rgba(#063f5c, 0.95);
+    background-repeat: repeat;
+    border: 4px solid #fff;
+    border-radius: 50dvmax;
+    color: rgba(#fff, 0.25);
+    height: 60px;
+    padding: 0 36px;
+  }
+
+  .button span {
+    color: #fff;
+    font-size: 1.8rem;
+  }
+}

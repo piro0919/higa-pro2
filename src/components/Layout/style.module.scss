@@ -1,0 +1,114 @@
+.wrapper {
+  position: relative;
+}
+
+.header {
+  display: grid;
+  grid-template: 1fr / repeat(2, auto);
+  height: 95svh;
+  overflow: hidden;
+  position: relative;
+
+  .list {
+    display: grid;
+  }
+
+  .item {
+    clip-path: polygon(48px 0%, 100% 0%, calc(100% - 48px) 100%, 0% 100%);
+    margin: 0 0 0 -48px;
+    position: relative;
+  }
+
+  .imageWrapper {
+    height: 100%;
+  }
+
+  .image {
+    filter: drop-shadow(6px 6px rgba(#063f5c, 0.75));
+    inset: 0;
+    object-fit: cover;
+    position: absolute;
+  }
+
+  .logoWrapper {
+    align-items: center;
+    background-color: hsla(0, 0%, 100%, 0.25);
+    background-repeat: repeat;
+    color: hsla(0, 0%, 100%, 0.25);
+    display: flex;
+    inset: 0;
+    justify-content: center;
+    position: absolute;
+  }
+
+  .logoWrapper2 {
+    backdrop-filter: blur(1px);
+    border-radius: 50dvmax;
+  }
+
+  .logoWrapper3 {
+    filter: drop-shadow(0 0 5px #666) drop-shadow(0 0 15px rgba(#fff, 0.5))
+      drop-shadow(0 0 25px rgba(#6777ff, 0.5))
+      drop-shadow(0 0 35px rgba(#6777ff, 0.25));
+    height: min(480px, 80dvmin);
+    position: relative;
+    width: min(480px, 80dvmin);
+  }
+}
+
+.aside {
+  display: flex;
+  height: calc(100% - 95svh);
+  justify-content: center;
+  margin-top: -30px;
+  position: absolute;
+  top: 95svh;
+  width: 100%;
+
+  .inner {
+    align-items: center;
+    backdrop-filter: blur(1px);
+    background-color: rgba(#063f5c, 0.95);
+    background-repeat: repeat;
+    border: 4px solid #fff;
+    border-radius: 50dvmax;
+    color: rgba(#fff, 0.25);
+    display: flex;
+    height: 60px;
+    justify-content: center;
+    position: sticky;
+    top: 12px;
+    width: min(1280px, 100%);
+    z-index: 1;
+  }
+
+  .list {
+    display: flex;
+    gap: 36px;
+  }
+
+  .link {
+    color: #fff;
+    font-size: 1.8rem;
+    transition: 250ms;
+  }
+
+  .active {
+    color: #6777ff;
+  }
+}
+
+.footer {
+  align-items: center;
+  background-color: #063f5c;
+  background-repeat: repeat;
+  color: rgba(#fff, 0.25);
+  display: flex;
+  flex-direction: column;
+
+  .copyright {
+    color: #fff;
+    font-size: 1.5rem;
+    margin: -24px 0 60px;
+  }
+}

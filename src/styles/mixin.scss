@@ -1,0 +1,64 @@
+@keyframes border-animation {
+  from {
+    background-position:
+      0 0,
+      -32px 0,
+      100% -32px,
+      0 100%;
+  }
+
+  to {
+    background-position:
+      0 -32px,
+      0 0,
+      100% 0,
+      -32px 100%;
+  }
+}
+
+@mixin border-animation {
+  animation: border-animation 1s infinite linear;
+  background-image: repeating-linear-gradient(
+      0deg,
+      #fff,
+      #fff 16px,
+      transparent 16px,
+      transparent 32px,
+      #fff 32px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      #fff,
+      #fff 16px,
+      transparent 16px,
+      transparent 32px,
+      #fff 32px
+    ),
+    repeating-linear-gradient(
+      180deg,
+      #fff,
+      #fff 16px,
+      transparent 16px,
+      transparent 32px,
+      #fff 32px
+    ),
+    repeating-linear-gradient(
+      270deg,
+      #fff,
+      #fff 16px,
+      transparent 16px,
+      transparent 32px,
+      #fff 32px
+    );
+  background-position:
+    0 0,
+    0 0,
+    100% 0,
+    0 100%;
+  background-repeat: no-repeat;
+  background-size:
+    6px calc(100% + 32px),
+    calc(100% + 32px) 6px,
+    6px calc(100% + 32px),
+    calc(100% + 32px) 6px;
+}
