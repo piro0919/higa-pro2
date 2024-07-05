@@ -29,43 +29,19 @@
     object-fit: cover;
     position: absolute;
   }
-
-  .logoWrapper {
-    align-items: center;
-    background-color: hsla(0, 0%, 100%, 0.25);
-    background-repeat: repeat;
-    color: hsla(0, 0%, 100%, 0.25);
-    display: flex;
-    inset: 0;
-    justify-content: center;
-    position: absolute;
-  }
-
-  .logoWrapper2 {
-    backdrop-filter: blur(1px);
-    border-radius: 50dvmax;
-  }
-
-  .logoWrapper3 {
-    filter: drop-shadow(0 0 5px #666) drop-shadow(0 0 15px rgba(#fff, 0.5))
-      drop-shadow(0 0 25px rgba(#6777ff, 0.5))
-      drop-shadow(0 0 35px rgba(#6777ff, 0.25));
-    height: min(480px, 80dvmin);
-    position: relative;
-    width: min(480px, 80dvmin);
-  }
 }
 
 .aside {
   display: flex;
   height: calc(100% - 95svh);
-  justify-content: center;
   margin-top: -30px;
+  padding: 0 min(3dvw, 30px);
   position: absolute;
   top: 95svh;
   width: 100%;
 
-  .inner {
+  .inner,
+  .inner2 {
     align-items: center;
     backdrop-filter: blur(1px);
     background-color: rgba(#063f5c, 0.95);
@@ -78,8 +54,14 @@
     justify-content: center;
     position: sticky;
     top: 12px;
-    width: min(1280px, 100%);
     z-index: 1;
+  }
+
+  .inner {
+    width: min(1280px, 100%);
+    @media (max-width: 980px) {
+      display: none;
+    }
   }
 
   .list {
@@ -95,6 +77,29 @@
 
   .active {
     color: #6777ff;
+  }
+
+  .iconWrapper {
+    inset: auto 4px auto auto;
+    position: absolute;
+  }
+
+  .icon {
+    height: 44px !important;
+    width: 44px !important;
+  }
+
+  .inner2 {
+    @media (min-width: 980px) {
+      display: none;
+    }
+  }
+
+  @media (min-width: 980px) {
+    justify-content: center;
+  }
+  @media (max-width: 980px) {
+    justify-content: flex-end;
   }
 }
 

@@ -1,7 +1,25 @@
 import App, { AppProps } from "@/components/App";
 import client from "@/lib/client";
 
-export default async function Page(): Promise<JSX.Element> {
+type PageProps = {
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
+export default async function Page({
+  searchParams: { debut, newsId, type },
+}: PageProps): Promise<JSX.Element> {
+  if (typeof debut !== "undefined" && typeof debut !== "string") {
+    throw new Error("debut is not undefined and string");
+  }
+
+  if (typeof newsId !== "undefined" && typeof newsId !== "string") {
+    throw new Error("newsId is not undefined and string");
+  }
+
+  if (typeof type !== "undefined" && typeof type !== "string") {
+    throw new Error("type is not undefined and string");
+  }
+
   const { contents: newsContents } = await client.getList({
     customRequestInit: {
       next: {
@@ -11,7 +29,7 @@ export default async function Page(): Promise<JSX.Element> {
     },
     endpoint: "news",
     queries: {
-      fields: ["createdAt", "id", "title"],
+      fields: ["content", "createdAt", "id", "title"],
       limit: 3,
     },
   });
@@ -22,6 +40,9 @@ export default async function Page(): Promise<JSX.Element> {
       title,
     }),
   );
+  const newsContent: AppProps["newsContent"] = newsContents.find(
+    ({ id }) => newsId === id,
+  )?.content;
   const { contents: talentsContents } = await client.getList({
     customRequestInit: {
       next: {
@@ -31,7 +52,7 @@ export default async function Page(): Promise<JSX.Element> {
     },
     endpoint: "talents",
     queries: {
-      // fields: ["createdAt", "id", "title"],
+      fields: ["debut", "furigana", "id", "images", "name", "type"],
       limit: 100,
     },
   });
@@ -55,6 +76,13 @@ export default async function Page(): Promise<JSX.Element> {
     }));
 
   return (
-    <App managerList={managerList} newsList={newsList} talents={talents} />
+    <App
+      debut={debut}
+      managerList={managerList}
+      newsContent={newsContent}
+      newsList={newsList}
+      talents={talents}
+      type={type}
+    />
   );
 }

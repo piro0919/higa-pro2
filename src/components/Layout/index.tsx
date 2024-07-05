@@ -1,15 +1,23 @@
 "use client";
 import { motion } from "framer-motion";
+import Hamburger from "hamburger-react";
 import i18next from "i18next";
 import { Jost } from "next/font/google";
 import Image from "next/image";
+import NextLink from "next/link";
+import { usePathname } from "next/navigation";
 import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
 import { ReactNode, useMemo } from "react";
 import { Link } from "react-scroll";
+import { SocialIcon } from "react-social-icons";
+import { ToastContainer } from "react-toastify";
+import useShowWindowSize from "use-show-window-size";
 import { z } from "zod";
 import { zodI18nMap } from "zod-i18n-map";
 import translation from "zod-i18n-map/locales/ja/zod.json";
+import { useShallow } from "zustand/react/shallow";
 import styles from "./style.module.scss";
+import useHeaderStore from "@/stores/useHeaderStore";
 
 void i18next.init({
   lng: "ja",
@@ -89,102 +97,83 @@ export default function Layout({
       )),
     [talentItems],
   );
+  const { header } = useHeaderStore(useShallow(({ header }) => ({ header })));
+  const pathname = usePathname();
+
+  useShowWindowSize({
+    disable: process.env.NODE_ENV === "production",
+  });
 
   return (
     <>
       <div className={styles.wrapper}>
         <header className={styles.header} id="top">
           {headerItems}
-          <div className={`${styles.logoWrapper} pattern-cross-dots-lg`}>
-            <div className={styles.logoWrapper2}>
-              <motion.div
-                animate={{ opacity: 1 }}
-                className={styles.logoWrapper3}
-                initial={{ opacity: 0 }}
-                transition={{ duration: 0.1, ease: "linear" }}
-              >
-                <Image
-                  alt="Higa Production"
-                  fill={true}
-                  quality={100}
-                  src="/logo.png"
-                />
-              </motion.div>
-            </div>
-          </div>
+          {header}
         </header>
         <aside className={styles.aside}>
           <div className={`${styles.inner} pattern-cross-dots-lg`}>
             <nav>
               <ul className={styles.list}>
-                <li>
-                  <Link
-                    activeClass={styles.active}
-                    className={`${styles.link} ${jost.className}`}
-                    hashSpy={true}
-                    spy={true}
-                    to="top"
-                  >
-                    TOP
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    activeClass={styles.active}
-                    className={`${styles.link} ${jost.className}`}
-                    hashSpy={true}
-                    spy={true}
-                    to="about"
-                  >
-                    ABOUT
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    activeClass={styles.active}
-                    className={`${styles.link} ${jost.className}`}
-                    hashSpy={true}
-                    spy={true}
-                    to="news"
-                  >
-                    NEWS
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    activeClass={styles.active}
-                    className={`${styles.link} ${jost.className}`}
-                    hashSpy={true}
-                    spy={true}
-                    to="talent"
-                  >
-                    TALENT
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    activeClass={styles.active}
-                    className={`${styles.link} ${jost.className}`}
-                    hashSpy={true}
-                    spy={true}
-                    to="manager"
-                  >
-                    MANAGER
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    activeClass={styles.active}
-                    className={`${styles.link} ${jost.className}`}
-                    hashSpy={true}
-                    spy={true}
-                    to="contact"
-                  >
-                    CONTACT
-                  </Link>
-                </li>
+                {[
+                  {
+                    title: "TOP",
+                    to: "top",
+                  },
+                  {
+                    title: "ABOUT",
+                    to: "about",
+                  },
+                  {
+                    title: "NEWS",
+                    to: "news",
+                  },
+                  {
+                    title: "TALENT",
+                    to: "talent",
+                  },
+                  {
+                    title: "MANAGER",
+                    to: "manager",
+                  },
+                  {
+                    title: "CONTACT",
+                    to: "contact",
+                  },
+                ].map(({ title, to }) => (
+                  <li key={to}>
+                    {pathname === "/" ? (
+                      <Link
+                        activeClass={styles.active}
+                        className={`${styles.link} ${jost.className}`}
+                        hashSpy={true}
+                        spy={true}
+                        to={to}
+                      >
+                        {title}
+                      </Link>
+                    ) : (
+                      <NextLink
+                        className={`${styles.link} ${jost.className}`}
+                        href={`/#${to}`}
+                      >
+                        {title}
+                      </NextLink>
+                    )}
+                  </li>
+                ))}
               </ul>
             </nav>
+            <div className={styles.iconWrapper}>
+              <SocialIcon
+                className={styles.icon}
+                target="_blank"
+                url="https://x.com/HIGA_pro_0608"
+              />
+            </div>
+          </div>
+          <div className={`${styles.inner2} pattern-cross-dots-lg`}>
+            <Hamburger color="#fff" size={30} />
           </div>
         </aside>
         <main>{children}</main>
@@ -192,6 +181,7 @@ export default function Layout({
           <Image
             alt="Higa Production"
             height={320}
+            loading="eager"
             quality={100}
             src="/logo.png"
             width={320}
@@ -201,6 +191,13 @@ export default function Layout({
           </div>
         </footer>
       </div>
+      <ToastContainer
+        autoClose={5000}
+        closeOnClick={true}
+        hideProgressBar={false}
+        pauseOnHover={false}
+        position="bottom-left"
+      />
       <ProgressBar />
     </>
   );
