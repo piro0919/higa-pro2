@@ -2,7 +2,7 @@
   "dependencies": {
     "@ducanh2912/next-pwa": "10.2.7",
     "@hookform/error-message": "2.0.1",
-    "@hookform/resolvers": "3.8.0",
+    "@hookform/resolvers": "3.9.0",
     "@t3-oss/env-nextjs": "0.10.1",
     "dayjs": "1.11.11",
     "fast-shuffle": "6.1.0",
