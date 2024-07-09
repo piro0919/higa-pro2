@@ -6,14 +6,10 @@ type PageProps = {
 };
 
 export default async function Page({
-  searchParams: { debut, newsId, type },
+  searchParams: { debut, type },
 }: PageProps): Promise<JSX.Element> {
   if (typeof debut !== "undefined" && typeof debut !== "string") {
     throw new Error("debut is not undefined and string");
-  }
-
-  if (typeof newsId !== "undefined" && typeof newsId !== "string") {
-    throw new Error("newsId is not undefined and string");
   }
 
   if (typeof type !== "undefined" && typeof type !== "string") {
@@ -34,15 +30,13 @@ export default async function Page({
     },
   });
   const newsList: AppProps["newsList"] = newsContents.map(
-    ({ createdAt, id, title }) => ({
+    ({ content, createdAt, id, title }) => ({
+      content,
       createdAt,
       id,
       title,
     }),
   );
-  const newsContent: AppProps["newsContent"] = newsContents.find(
-    ({ id }) => newsId === id,
-  )?.content;
   const { contents: talentsContents } = await client.getList({
     customRequestInit: {
       next: {
@@ -79,7 +73,6 @@ export default async function Page({
     <App
       debut={debut}
       managerList={managerList}
-      newsContent={newsContent}
       newsList={newsList}
       talents={talents}
       type={type}

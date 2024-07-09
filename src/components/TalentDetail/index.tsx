@@ -1,21 +1,29 @@
 "use client";
 import dayjs from "dayjs";
 import { motion } from "framer-motion";
-import { Jost, M_PLUS_1 as MPlus1, Raleway } from "next/font/google";
+import {
+  Jost,
+  M_PLUS_1 as MPlus1,
+  Mochiy_Pop_P_One as MochiyPopPOne,
+  Raleway,
+} from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import queryString from "query-string";
 import { useEffect, useMemo } from "react";
+import { useInView } from "react-intersection-observer";
 import { SocialIcon } from "react-social-icons";
 import sortArray from "sort-array";
 import Typewriter from "typewriter-effect";
+import { useBoolean, useSessionStorage, useWindowSize } from "usehooks-ts";
 import { useShallow } from "zustand/react/shallow";
 import styles from "./style.module.scss";
 import useHeaderStore from "@/stores/useHeaderStore";
 
 const jost = Jost({ subsets: ["latin"], weight: "700" });
 const mPlus1 = MPlus1({ subsets: ["latin"], weight: "700" });
+const mochiyPopPOne = MochiyPopPOne({ subsets: ["latin"], weight: "400" });
 const raleway = Raleway({ subsets: ["latin"], weight: "800" });
 
 type Talent = {
@@ -74,79 +82,181 @@ export default function TalentDetail({
 
     return dayjs(talent.debut).format("YYYY-MM");
   }, [selectedDebut, talentId, talents]);
-  const { setHeader } = useHeaderStore(
-    useShallow(({ setHeader }) => ({ setHeader })),
+  const { loaded: headerLoaded, setHeader } = useHeaderStore(
+    useShallow((state) => ({
+      loaded: state.loaded,
+      setHeader: state.setHeader,
+    })),
   );
+  const { height } = useWindowSize();
+  const { setTrue: onLoaded, value: loaded } = useBoolean(false);
+  const [isFirstRenderd, setIsFirstRenderd] = useSessionStorage(
+    "isFirstRenderd",
+    false,
+  );
+  const { inView, ref } = useInView({
+    rootMargin: "-25% 0px -25% 0px",
+    triggerOnce: true,
+  });
+
+  useEffect(() => {
+    if (!headerLoaded) {
+      setIsFirstRenderd(false);
+
+      return;
+    }
+
+    setTimeout(() => setIsFirstRenderd(true), 1250);
+  }, [headerLoaded, setIsFirstRenderd]);
 
   useEffect(() => {
     setHeader(
-      <div className={`${styles.talentWrapper} pattern-cross-dots-lg`}>
-        <div className={styles.imageWrapper}>
-          <Image
-            alt={name}
-            className={styles.image}
-            fill={true}
-            quality={100}
-            src={imageUrl}
-          />
-        </div>
-        <div className={`${styles.detailWrapper} pattern-grid-md`}>
-          <div className={styles.inner}>
-            <OverlayScrollbarsComponent>
-              <div className={`${styles.profile} ${mPlus1.className}`}>
-                <Typewriter
-                  onInit={(typewriter): void => {
-                    typewriter.typeString(profile).start();
-                  }}
-                  options={{
-                    delay: 25,
-                    loop: false,
-                  }}
-                />
-              </div>
-            </OverlayScrollbarsComponent>
-            <div className={styles.sideWrapper}>
-              <div className={styles.linksWrapper}>
-                <a
-                  className={`${styles.link} pattern-cross-dots-lg`}
-                  href={iriamUrl}
-                  target="_blank"
-                >
-                  <div className={styles.imageWrapper2}>
-                    <Image alt="IRIAM" fill={true} src="/iriam.jpg" />
-                  </div>
-                  <span className={jost.className}>IRIAM</span>
-                </a>
-                <a
-                  className={`${styles.link} pattern-cross-dots-lg`}
-                  href={twitterUrl.replace("twitter", "x")}
-                  target="_blank"
-                >
-                  <SocialIcon
-                    className={styles.icon}
-                    target="_blank"
-                    url={twitterUrl.replace("twitter", "x")}
+      isFirstRenderd ? (
+        <div
+          className={`${styles.talentWrapper} pattern-cross-dots-lg`}
+          key={talentId}
+        >
+          <motion.div
+            animate={{
+              opacity: loaded ? 1 : 0,
+              transform: `translate(${loaded ? "0dvw" : "25dvw"}, 0)`,
+            }}
+            className={styles.imageWrapper}
+            initial={{ opacity: 0, transform: "translate(25dvw, 0)" }}
+            transition={{
+              duration: 0.75,
+              ease: "backOut",
+            }}
+          >
+            {
+              <Image
+                alt={name}
+                className={styles.image}
+                fill={true}
+                loading="eager"
+                onLoad={() => onLoaded()}
+                quality={100}
+                src={`${imageUrl}?fit=max&h=${height * 2}`}
+              />
+            }
+          </motion.div>
+          <div className={`${styles.detailWrapper} pattern-grid-md`}>
+            <div className={styles.inner}>
+              <motion.div
+                animate={{ opacity: 1, transform: "translate(0, 0%)" }}
+                className={styles.h1Wrapper}
+                initial={{ opacity: 0, transform: "translate(0, 100%)" }}
+                transition={{
+                  delay: 0.1,
+                  duration: 0.75,
+                  ease: (x: number): number => 1 - Math.pow(1 - x, 4),
+                }}
+              >
+                <h1 className={`${styles.h1} ${mochiyPopPOne.className}`}>
+                  {name}
+                </h1>
+              </motion.div>
+              <OverlayScrollbarsComponent>
+                <div className={`${styles.profile} ${mPlus1.className}`}>
+                  <Typewriter
+                    onInit={(typewriter): void => {
+                      typewriter.typeString(profile).start();
+                    }}
+                    options={{
+                      delay: 25,
+                      loop: false,
+                    }}
                   />
-                  <span className={jost.className}>X</span>
-                </a>
-              </div>
-              <div className={styles.textsWrapper}>
-                <div
-                  className={styles.debut}
-                >{`デビュー日：${dayjs(debut).format("YYYY.M.D")}`}</div>
+                </div>
+              </OverlayScrollbarsComponent>
+              <div className={styles.sideWrapper}>
+                <div className={styles.linksWrapper}>
+                  <motion.a
+                    animate={{
+                      transform: "scale(1)",
+                    }}
+                    className={`${styles.link} pattern-cross-dots-lg`}
+                    href={iriamUrl}
+                    initial={{ transform: "scale(0)" }}
+                    target="_blank"
+                    transition={{
+                      duration: 0.75,
+                      ease: "backOut",
+                    }}
+                  >
+                    <div className={styles.imageWrapper2}>
+                      <Image alt="IRIAM" fill={true} src="/iriam.jpg" />
+                    </div>
+                    <span className={jost.className}>IRIAM</span>
+                  </motion.a>
+                  <motion.a
+                    animate={{
+                      transform: "scale(1)",
+                    }}
+                    className={`${styles.link} pattern-cross-dots-lg`}
+                    href={twitterUrl.replace("twitter", "x")}
+                    initial={{ transform: "scale(0)" }}
+                    target="_blank"
+                    transition={{
+                      delay: 0.1,
+                      duration: 0.75,
+                      ease: "backOut",
+                    }}
+                  >
+                    <SocialIcon
+                      className={styles.icon}
+                      target="_blank"
+                      url={twitterUrl.replace("twitter", "x")}
+                    />
+                    <span className={jost.className}>X</span>
+                  </motion.a>
+                </div>
+                <div className={styles.textsWrapper}>
+                  <div className={styles.debut}>
+                    <Typewriter
+                      onInit={(typewriter): void => {
+                        typewriter
+                          .typeString(
+                            `デビュー日：${dayjs(debut).format("YYYY.M.D")}`,
+                          )
+                          .start();
+                      }}
+                      options={{
+                        delay: 25,
+                        loop: false,
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>,
+      ) : null,
     );
-  }, [debut, imageUrl, iriamUrl, name, profile, setHeader, twitterUrl]);
+  }, [
+    debut,
+    headerLoaded,
+    height,
+    imageUrl,
+    iriamUrl,
+    isFirstRenderd,
+    loaded,
+    name,
+    onLoaded,
+    profile,
+    setHeader,
+    setIsFirstRenderd,
+    talentId,
+    twitterUrl,
+  ]);
 
   return (
     <article
       className={`${styles.article} pattern-zigzag-lg`}
       data-article="talent"
       id="talent"
+      ref={ref}
     >
       <div className={styles.inner}>
         <motion.div
@@ -188,35 +298,96 @@ export default function TalentDetail({
                 ({ debut }) => talentDebut === dayjs(debut).format("YYYY-MM"),
               ),
               { by: "furigana" },
-            ).map(({ furigana, id, imageUrl = "/no-image.png", name }) => (
-              <li className={`${styles.item2} pattern-grid-md`} key={id}>
-                <Link href={`/talents/${id}#top`}>
-                  <div className={styles.name}>{name}</div>
-                  <div className={styles.imageWrapper}>
-                    <div className={styles.imageWrapper2}>
-                      <Image
-                        alt={name}
-                        className={styles.image}
-                        fill={true}
-                        loading="eager"
-                        quality={100}
-                        src={imageUrl}
-                        style={
-                          imageUrl === "/no-image.png"
-                            ? {
-                                objectFit: "contain",
-                              }
-                            : {
-                                objectFit: "cover",
-                              }
-                        }
-                      />
+            ).map(
+              ({ furigana, id, imageUrl = "/no-image.png", name }, index) => (
+                <motion.li
+                  animate={{
+                    opacity: isFirstRenderd && inView ? 1 : 0,
+                    transform: `translate(${isFirstRenderd && inView ? 0 : 50}%, ${
+                      isFirstRenderd && inView ? 0 : 50
+                    }%)`,
+                  }}
+                  className={`${styles.item2} pattern-grid-md`}
+                  initial={{ opacity: 0, transform: "translate(50%, 50%)" }}
+                  key={id}
+                  transition={{
+                    delay: index * 0.1,
+                    duration: 0.75,
+                    ease: "backOut",
+                  }}
+                >
+                  <Link href={`/talents/${id}#top`}>
+                    <motion.div
+                      animate={{
+                        opacity: isFirstRenderd && inView ? 1 : 0,
+                      }}
+                      className={styles.name}
+                      initial={{
+                        opacity: 0,
+                      }}
+                      transition={{
+                        delay: index * 0.1,
+                        duration: 0.75,
+                      }}
+                    >
+                      {name}
+                    </motion.div>
+                    <div className={styles.imageWrapper}>
+                      <motion.div
+                        animate={{
+                          opacity: isFirstRenderd && inView ? 1 : 0,
+                          transform: `translate(${isFirstRenderd && inView ? 0 : 50}%, ${
+                            isFirstRenderd && inView ? 0 : 50
+                          }%)`,
+                        }}
+                        className={styles.imageWrapper2}
+                        initial={{
+                          opacity: 0,
+                          transform: "translate(50%, 50%)",
+                        }}
+                        transition={{
+                          delay: index * 0.1,
+                          duration: 0.75,
+                          ease: "backOut",
+                        }}
+                      >
+                        <Image
+                          alt={name}
+                          className={styles.image}
+                          fill={true}
+                          quality={100}
+                          src={`${imageUrl}?fit=max&h=1000`}
+                          style={
+                            imageUrl === "/no-image.png"
+                              ? {
+                                  objectFit: "contain",
+                                }
+                              : {
+                                  objectFit: "cover",
+                                }
+                          }
+                        />
+                      </motion.div>
                     </div>
-                  </div>
-                  <div className={styles.furigana}>{furigana}</div>
-                </Link>
-              </li>
-            ))}
+                    <motion.div
+                      animate={{
+                        opacity: isFirstRenderd && inView ? 1 : 0,
+                      }}
+                      className={styles.furigana}
+                      initial={{
+                        opacity: 0,
+                      }}
+                      transition={{
+                        delay: index * 0.1,
+                        duration: 0.75,
+                      }}
+                    >
+                      {furigana}
+                    </motion.div>
+                  </Link>
+                </motion.li>
+              ),
+            )}
           </ul>
         </div>
       </div>

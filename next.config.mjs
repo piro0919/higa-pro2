@@ -16,6 +16,7 @@ const nextConfig = withPWA({
   images: {
     unoptimized: true,
   },
+  reactStrictMode: false,
 });
 
 export default nextConfig;

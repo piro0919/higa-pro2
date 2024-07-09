@@ -7,11 +7,14 @@ import Image from "next/image";
 import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
-import { ReactNode, useMemo } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
+import { CircularProgressbar } from "react-circular-progressbar";
+import Drawer from "react-modern-drawer";
 import { Link } from "react-scroll";
 import { SocialIcon } from "react-social-icons";
 import { ToastContainer } from "react-toastify";
 import useShowWindowSize from "use-show-window-size";
+import { useBoolean, useWindowSize } from "usehooks-ts";
 import { z } from "zod";
 import { zodI18nMap } from "zod-i18n-map";
 import translation from "zod-i18n-map/locales/ja/zod.json";
@@ -50,35 +53,16 @@ export default function Layout({
   children,
   talents,
 }: LayoutProps): JSX.Element {
-  const talentItems = useMemo(
-    () =>
-      talents.map(({ id, images: [{ url }] }, index) => (
-        <div className={styles.item} key={id}>
-          <motion.div
-            animate={{
-              transform: "translate(0, 0)",
-            }}
-            className={styles.imageWrapper}
-            initial={{ transform: "translate(-200%, 0)" }}
-            transition={{
-              delay: 0.1 * index,
-              duration: 1,
-              ease: "backOut",
-            }}
-          >
-            <Image
-              alt={id}
-              className={styles.image}
-              fill={true}
-              loading="eager"
-              quality={100}
-              src={url}
-            />
-          </motion.div>
-        </div>
-      )),
-    [talents],
+  const { height } = useWindowSize();
+  const [loadedIndexList, setLoadedIndexList] = useState<number[]>([]);
+  const { header, loaded, setLoaded } = useHeaderStore(
+    useShallow((state) => ({
+      header: state.header,
+      loaded: state.loaded,
+      setLoaded: state.setLoaded,
+    })),
   );
+  const [talentItems, setTalentItems] = useState<ReactNode[]>([]);
   const headerItems = useMemo(
     () =>
       Array.from({ length: 2 }, (_, index) => (
@@ -97,12 +81,92 @@ export default function Layout({
       )),
     [talentItems],
   );
-  const { header } = useHeaderStore(useShallow(({ header }) => ({ header })));
   const pathname = usePathname();
+  const paths = useMemo(
+    () => [
+      {
+        title: "TOP",
+        to: "top",
+      },
+      {
+        title: "ABOUT",
+        to: "about",
+      },
+      {
+        title: "NEWS",
+        to: "news",
+      },
+      {
+        title: "TALENT",
+        to: "talent",
+      },
+      {
+        title: "MANAGER",
+        to: "manager",
+      },
+      {
+        title: "CONTACT",
+        to: "contact",
+      },
+    ],
+    [],
+  );
+  const {
+    setFalse: offIsOpen,
+    toggle: toggleDrawer,
+    value: isOpen,
+  } = useBoolean(false);
 
   useShowWindowSize({
     disable: process.env.NODE_ENV === "production",
   });
+
+  useEffect(() => {
+    setLoaded(loadedIndexList.length / talents.length === 1);
+  }, [loadedIndexList.length, setLoaded, talents.length]);
+
+  useEffect(() => {
+    if (height === 0) {
+      return;
+    }
+
+    setTalentItems(
+      talents.map(({ id, images: [{ url }] }, index) => (
+        <div className={styles.item} key={id}>
+          <motion.div
+            animate={{
+              transform: `translate(${loaded ? "0" : "-200%"}, 0)`,
+            }}
+            className={styles.imageWrapper}
+            initial={{ transform: "translate(-200%, 0)" }}
+            transition={{
+              delay: 0.1 * index + 0.75,
+              duration: 1,
+              ease: "backOut",
+            }}
+          >
+            {
+              <Image
+                alt={id}
+                className={styles.image}
+                fill={true}
+                loading="eager"
+                onLoad={() => {
+                  setLoadedIndexList((prevLoadedIndexList) =>
+                    prevLoadedIndexList.includes(index)
+                      ? prevLoadedIndexList
+                      : [...prevLoadedIndexList, index],
+                  );
+                }}
+                quality={100}
+                src={`${url}?fit=max&h=${height}`}
+              />
+            }
+          </motion.div>
+        </div>
+      )),
+    );
+  }, [height, loaded, talents]);
 
   return (
     <>
@@ -115,32 +179,7 @@ export default function Layout({
           <div className={`${styles.inner} pattern-cross-dots-lg`}>
             <nav>
               <ul className={styles.list}>
-                {[
-                  {
-                    title: "TOP",
-                    to: "top",
-                  },
-                  {
-                    title: "ABOUT",
-                    to: "about",
-                  },
-                  {
-                    title: "NEWS",
-                    to: "news",
-                  },
-                  {
-                    title: "TALENT",
-                    to: "talent",
-                  },
-                  {
-                    title: "MANAGER",
-                    to: "manager",
-                  },
-                  {
-                    title: "CONTACT",
-                    to: "contact",
-                  },
-                ].map(({ title, to }) => (
+                {paths.map(({ title, to }) => (
                   <li key={to}>
                     {pathname === "/" ? (
                       <Link
@@ -172,8 +211,11 @@ export default function Layout({
               />
             </div>
           </div>
-          <div className={`${styles.inner2} pattern-cross-dots-lg`}>
-            <Hamburger color="#fff" size={30} />
+          <div
+            className={`${styles.inner2} pattern-cross-dots-lg`}
+            onClick={() => toggleDrawer()}
+          >
+            <Hamburger color="#fff" size={30} toggled={isOpen} />
           </div>
         </aside>
         <main>{children}</main>
@@ -181,7 +223,6 @@ export default function Layout({
           <Image
             alt="Higa Production"
             height={320}
-            loading="eager"
             quality={100}
             src="/logo.png"
             width={320}
@@ -199,6 +240,74 @@ export default function Layout({
         position="bottom-left"
       />
       <ProgressBar />
+      <motion.div
+        animate={
+          loaded
+            ? {
+                opacity: 0,
+                transitionEnd: {
+                  display: "none",
+                },
+              }
+            : {
+                opacity: 1,
+              }
+        }
+        className={`${styles.loadingWrapper} pattern-cross-dots-lg`}
+        initial={{ opacity: 1 }}
+        transition={{
+          delay: 1,
+          duration: 1,
+        }}
+      >
+        <CircularProgressbar
+          className={styles.circularProgressbar}
+          styles={{
+            text: {
+              fill: "fff",
+            },
+            trail: {
+              stroke: "#fff",
+            },
+          }}
+          text={`${Math.ceil((loadedIndexList.length / talents.length) * 100)}%`}
+          value={(loadedIndexList.length / talents.length) * 100}
+        />
+      </motion.div>
+      <Drawer
+        className={`${styles.drawer} pattern-cross-dots-lg`}
+        direction="top"
+        onClose={toggleDrawer}
+        open={isOpen}
+      >
+        <nav>
+          <ul className={styles.list}>
+            {paths.map(({ title, to }) => (
+              <li key={to}>
+                {pathname === "/" ? (
+                  <Link
+                    className={`${styles.link} ${jost.className}`}
+                    hashSpy={true}
+                    onClick={() => offIsOpen()}
+                    spy={true}
+                    to={to}
+                  >
+                    {title}
+                  </Link>
+                ) : (
+                  <NextLink
+                    className={`${styles.link} ${jost.className}`}
+                    href={`/#${to}`}
+                    onClick={() => offIsOpen()}
+                  >
+                    {title}
+                  </NextLink>
+                )}
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </Drawer>
     </>
   );
 }

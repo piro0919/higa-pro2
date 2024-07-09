@@ -1,18 +1,20 @@
 "use client";
 import { ErrorMessage } from "@hookform/error-message";
 import { zodResolver } from "@hookform/resolvers/zod";
+import NoSSR from "@mpth/react-no-ssr";
 import dayjs from "dayjs";
 import { motion } from "framer-motion";
 import parse from "html-react-parser";
 import { Jost, Raleway } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next-nprogress-bar";
+import { useSearchParams } from "next/navigation";
 import queryString from "query-string";
 import { useEffect, useMemo, useRef } from "react";
+import { useCollapse } from "react-collapsed";
 import { Form, useForm } from "react-hook-form";
-import { IoMdArrowDroprightCircle } from "react-icons/io";
-import { Modal } from "react-responsive-modal";
+import { IoMdArrowDropdownCircle, IoMdArrowDropupCircle } from "react-icons/io";
+import { useInView } from "react-intersection-observer";
 import Spacer from "react-spacer";
 import TextareaAutosize from "react-textarea-autosize";
 import { Id, toast } from "react-toastify";
@@ -34,6 +36,7 @@ const schema = z.object({
 type FieldTypes = z.infer<typeof schema>;
 
 type News = {
+  content: string;
   createdAt: string;
   id: string;
   title: string;
@@ -58,7 +61,6 @@ type Manager = {
 export type AppProps = {
   debut?: string;
   managerList: Manager[];
-  newsContent?: string;
   newsList: News[];
   talents: Talent[];
   type?: string;
@@ -67,7 +69,6 @@ export type AppProps = {
 export default function App({
   debut,
   managerList,
-  newsContent,
   newsList,
   talents,
   type,
@@ -119,20 +120,30 @@ export default function App({
     resolver: zodResolver(schema),
   });
   const toastId = useRef<Id>(null);
-  const router = useRouter();
-  const { setHeader } = useHeaderStore(
-    useShallow(({ setHeader }) => ({ setHeader })),
+  const { loaded, setHeader } = useHeaderStore(
+    useShallow((state) => ({
+      loaded: state.loaded,
+      setHeader: state.setHeader,
+    })),
   );
+  const { inView: inViewTalent, ref: refTalent } = useInView({
+    rootMargin: "-25% 0px -25% 0px",
+    triggerOnce: true,
+  });
+  const { inView: inViewManager, ref: refManager } = useInView({
+    rootMargin: "-25% 0px -25% 0px",
+    triggerOnce: true,
+  });
 
   useEffect(() => {
     setHeader(
       <div className={`${styles.logoWrapper} pattern-cross-dots-lg`}>
         <div className={styles.inner}>
           <motion.div
-            animate={{ opacity: 1 }}
+            animate={{ opacity: loaded ? 1 : 0 }}
             className={styles.imageWrapper}
             initial={{ opacity: 0 }}
-            transition={{ duration: 0.1, ease: "linear" }}
+            transition={{ delay: 1.5, duration: 0.1, ease: "linear" }}
           >
             <Image
               alt="Higa Production"
@@ -145,7 +156,7 @@ export default function App({
         </div>
       </div>,
     );
-  }, [setHeader]);
+  }, [loaded, setHeader]);
 
   return (
     <>
@@ -190,23 +201,14 @@ export default function App({
           </motion.div>
           <div className={styles.content}>
             <ul className={styles.list}>
-              {newsList.map(({ createdAt, id, title }) => (
-                <li className={styles.item} key={id}>
-                  <Link
-                    className={styles.link}
-                    href={`${queryString.stringifyUrl({
-                      query: {
-                        newsId: id,
-                      },
-                      url: "/",
-                    })}#news`}
-                  >
-                    <div>{dayjs(createdAt).format("YYYY.MM.DD")}</div>
-                    <div>{title}</div>
-                    <Spacer grow={1} />
-                    <IoMdArrowDroprightCircle size={24} />
-                  </Link>
-                </li>
+              {newsList.map(({ content, createdAt, id, title }) => (
+                <NewsItem
+                  content={content}
+                  createdAt={createdAt}
+                  id={id}
+                  key={id}
+                  title={title}
+                />
               ))}
             </ul>
           </div>
@@ -216,6 +218,7 @@ export default function App({
         className={`${styles.article} pattern-zigzag-lg`}
         data-article="talent"
         id="talent"
+        ref={refTalent}
       >
         <div className={styles.inner}>
           <motion.div
@@ -258,35 +261,96 @@ export default function App({
                   ({ debut }) => talentDebut === dayjs(debut).format("YYYY-MM"),
                 ),
                 { by: "furigana" },
-              ).map(({ furigana, id, imageUrl = "/no-image.png", name }) => (
-                <li className={`${styles.item2} pattern-grid-md`} key={id}>
-                  <Link href={`/talents/${id}`}>
-                    <div className={styles.name}>{name}</div>
-                    <div className={styles.imageWrapper}>
-                      <div className={styles.imageWrapper2}>
-                        <Image
-                          alt={name}
-                          className={styles.image}
-                          fill={true}
-                          loading="eager"
-                          quality={100}
-                          src={imageUrl}
-                          style={
-                            imageUrl === "/no-image.png"
-                              ? {
-                                  objectFit: "contain",
-                                }
-                              : {
-                                  objectFit: "cover",
-                                }
-                          }
-                        />
+              ).map(
+                ({ furigana, id, imageUrl = "/no-image.png", name }, index) => (
+                  <motion.li
+                    animate={{
+                      opacity: inViewTalent ? 1 : 0,
+                      transform: `translate(${inViewTalent ? 0 : 50}%, ${
+                        inViewTalent ? 0 : 50
+                      }%)`,
+                    }}
+                    className={`${styles.item2} pattern-grid-md`}
+                    initial={{ opacity: 0, transform: "translate(50%, 50%)" }}
+                    key={id}
+                    transition={{
+                      delay: index * 0.1,
+                      duration: 0.75,
+                      ease: "backOut",
+                    }}
+                  >
+                    <Link href={`/talents/${id}#top`}>
+                      <motion.div
+                        animate={{
+                          opacity: inViewTalent ? 1 : 0,
+                        }}
+                        className={styles.name}
+                        initial={{
+                          opacity: 0,
+                        }}
+                        transition={{
+                          delay: index * 0.1,
+                          duration: 0.75,
+                        }}
+                      >
+                        {name}
+                      </motion.div>
+                      <div className={styles.imageWrapper}>
+                        <motion.div
+                          animate={{
+                            opacity: inViewTalent ? 1 : 0,
+                            transform: `translate(${inViewTalent ? 0 : 50}%, ${
+                              inViewTalent ? 0 : 50
+                            }%)`,
+                          }}
+                          className={styles.imageWrapper2}
+                          initial={{
+                            opacity: 0,
+                            transform: "translate(50%, 50%)",
+                          }}
+                          transition={{
+                            delay: index * 0.1,
+                            duration: 0.75,
+                            ease: "backOut",
+                          }}
+                        >
+                          <Image
+                            alt={name}
+                            className={styles.image}
+                            fill={true}
+                            quality={100}
+                            src={`${imageUrl}?fit=max&h=1000`}
+                            style={
+                              imageUrl === "/no-image.png"
+                                ? {
+                                    objectFit: "contain",
+                                  }
+                                : {
+                                    objectFit: "cover",
+                                  }
+                            }
+                          />
+                        </motion.div>
                       </div>
-                    </div>
-                    <div className={styles.furigana}>{furigana}</div>
-                  </Link>
-                </li>
-              ))}
+                      <motion.div
+                        animate={{
+                          opacity: inViewTalent ? 1 : 0,
+                        }}
+                        className={styles.furigana}
+                        initial={{
+                          opacity: 0,
+                        }}
+                        transition={{
+                          delay: index * 0.1,
+                          duration: 0.75,
+                        }}
+                      >
+                        {furigana}
+                      </motion.div>
+                    </Link>
+                  </motion.li>
+                ),
+              )}
             </ul>
           </div>
         </div>
@@ -295,6 +359,7 @@ export default function App({
         className={`${styles.article} pattern-vertical-stripes-xl`}
         data-article="manager"
         id="manager"
+        ref={refManager}
       >
         <div className={styles.inner}>
           <motion.div
@@ -338,35 +403,96 @@ export default function App({
                     managerDebut === dayjs(debut).format("YYYY-MM"),
                 ),
                 { by: "furigana" },
-              ).map(({ furigana, id, imageUrl = "/no-image.png", name }) => (
-                <li className={`${styles.item2} pattern-grid-md`} key={id}>
-                  <Link href={`/managers/${id}`}>
-                    <div className={styles.name}>{name}</div>
-                    <div className={styles.imageWrapper}>
-                      <div className={styles.imageWrapper2}>
-                        <Image
-                          alt={name}
-                          className={styles.image}
-                          fill={true}
-                          loading="eager"
-                          quality={100}
-                          src={imageUrl}
-                          style={
-                            imageUrl === "/no-image.png"
-                              ? {
-                                  objectFit: "contain",
-                                }
-                              : {
-                                  objectFit: "cover",
-                                }
-                          }
-                        />
+              ).map(
+                ({ furigana, id, imageUrl = "/no-image.png", name }, index) => (
+                  <motion.li
+                    animate={{
+                      opacity: inViewManager ? 1 : 0,
+                      transform: `translate(${inViewManager ? 0 : 50}%, ${
+                        inViewManager ? 0 : 50
+                      }%)`,
+                    }}
+                    className={`${styles.item2} pattern-grid-md`}
+                    initial={{ opacity: 0, transform: "translate(50%, 50%)" }}
+                    key={id}
+                    transition={{
+                      delay: index * 0.1,
+                      duration: 0.75,
+                      ease: "backOut",
+                    }}
+                  >
+                    <Link href={`/managers/${id}#top`}>
+                      <motion.div
+                        animate={{
+                          opacity: inViewManager ? 1 : 0,
+                        }}
+                        className={styles.name}
+                        initial={{
+                          opacity: 0,
+                        }}
+                        transition={{
+                          delay: index * 0.1,
+                          duration: 0.75,
+                        }}
+                      >
+                        {name}
+                      </motion.div>
+                      <div className={styles.imageWrapper}>
+                        <motion.div
+                          animate={{
+                            opacity: inViewManager ? 1 : 0,
+                            transform: `translate(${inViewManager ? 0 : 50}%, ${
+                              inViewManager ? 0 : 50
+                            }%)`,
+                          }}
+                          className={styles.imageWrapper2}
+                          initial={{
+                            opacity: 0,
+                            transform: "translate(50%, 50%)",
+                          }}
+                          transition={{
+                            delay: index * 0.1,
+                            duration: 0.75,
+                            ease: "backOut",
+                          }}
+                        >
+                          <Image
+                            alt={name}
+                            className={styles.image}
+                            fill={true}
+                            quality={100}
+                            src={`${imageUrl}?fit=max&h=1000`}
+                            style={
+                              imageUrl === "/no-image.png"
+                                ? {
+                                    objectFit: "contain",
+                                  }
+                                : {
+                                    objectFit: "cover",
+                                  }
+                            }
+                          />
+                        </motion.div>
                       </div>
-                    </div>
-                    <div className={styles.furigana}>{furigana}</div>
-                  </Link>
-                </li>
-              ))}
+                      <motion.div
+                        animate={{
+                          opacity: inViewManager ? 1 : 0,
+                        }}
+                        className={styles.furigana}
+                        initial={{
+                          opacity: 0,
+                        }}
+                        transition={{
+                          delay: index * 0.1,
+                          duration: 0.75,
+                        }}
+                      >
+                        {furigana}
+                      </motion.div>
+                    </Link>
+                  </motion.li>
+                ),
+              )}
             </ul>
           </div>
         </div>
@@ -510,17 +636,58 @@ export default function App({
           </div>
         </div>
       </article>
-      <Modal
-        center={true}
-        classNames={{
-          modal: styles.modal,
-          root: styles.root,
-        }}
-        onClose={() => router.push("/#news")}
-        open={typeof newsContent === "string"}
-      >
-        {parse(newsContent ?? "")}
-      </Modal>
     </>
+  );
+}
+
+type NewsItemProps = {
+  content: string;
+  createdAt: string;
+  id: string;
+  title: string;
+};
+
+function NewsItem({
+  content,
+  createdAt,
+  id,
+  title,
+}: NewsItemProps): JSX.Element {
+  const searchParams = useSearchParams();
+  const newsId = searchParams.get("newsId");
+  const isExpanded = useMemo(() => id === newsId, [id, newsId]);
+  // eslint-disable-next-line @typescript-eslint/unbound-method
+  const { getCollapseProps } = useCollapse({ isExpanded });
+
+  return (
+    <li className={styles.item}>
+      <Link
+        className={styles.link}
+        href={
+          isExpanded
+            ? "/#news"
+            : `${queryString.stringifyUrl({
+                query: {
+                  newsId: id,
+                },
+                url: "/",
+              })}#news`
+        }
+      >
+        <div className={styles.date}>
+          {dayjs(createdAt).format("YYYY.MM.DD")}
+        </div>
+        <div>{title}</div>
+        <Spacer grow={1} />
+        {isExpanded ? (
+          <IoMdArrowDropupCircle className={styles.icon} size={24} />
+        ) : (
+          <IoMdArrowDropdownCircle className={styles.icon} size={24} />
+        )}
+      </Link>
+      <p {...getCollapseProps()} className={styles.text}>
+        <NoSSR>{parse(content)}</NoSSR>
+      </p>
+    </li>
   );
 }

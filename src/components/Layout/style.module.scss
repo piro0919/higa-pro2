@@ -69,14 +69,14 @@
     gap: 36px;
   }
 
+  .active {
+    color: #6777ff;
+  }
+
   .link {
     color: #fff;
     font-size: 1.8rem;
     transition: 250ms;
-  }
-
-  .active {
-    color: #6777ff;
   }
 
   .iconWrapper {
@@ -115,5 +115,46 @@
     color: #fff;
     font-size: 1.5rem;
     margin: -24px 0 60px;
+  }
+}
+
+.loadingWrapper {
+  align-items: center;
+  background-color: #063f5c;
+  background-repeat: repeat;
+  color: rgba(#fff, 0.25);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  position: fixed;
+  z-index: 1;
+
+  .circularProgressbar {
+    height: 120px;
+    width: 120px;
+  }
+}
+
+.drawer {
+  align-items: center;
+  backdrop-filter: blur(1px);
+  background-color: rgba(#063f5c, 0.95) !important;
+  background-repeat: repeat !important;
+  color: rgba(#fff, 0.25);
+  display: flex;
+  height: auto !important;
+  justify-content: center;
+  padding: 48px 0;
+
+  .list {
+    display: grid;
+    gap: 24px;
+    text-align: center;
+  }
+
+  .link {
+    color: #fff;
+    font-size: 1.8rem;
+    transition: 250ms;
   }
 }
