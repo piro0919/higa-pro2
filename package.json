@@ -7,7 +7,7 @@
     "@t3-oss/env-nextjs": "0.11.0",
     "dayjs": "1.11.12",
     "fast-shuffle": "6.1.0",
-    "framer-motion": "11.3.19",
+    "framer-motion": "11.3.21",
     "hamburger-react": "2.5.1",
     "html-react-parser": "5.1.12",
     "i18next": "23.12.2",
