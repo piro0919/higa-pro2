@@ -4,7 +4,7 @@
     "@hookform/error-message": "2.0.1",
     "@hookform/resolvers": "3.9.0",
     "@mpth/react-no-ssr": "1.0.1",
-    "@t3-oss/env-nextjs": "0.11.0",
+    "@t3-oss/env-nextjs": "0.11.1",
     "dayjs": "1.11.13",
     "fast-shuffle": "6.1.0",
     "framer-motion": "11.3.30",
