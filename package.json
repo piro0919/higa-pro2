@@ -42,8 +42,8 @@
     "zustand": "4.5.5"
   },
   "devDependencies": {
-    "@commitlint/cli": "19.4.0",
-    "@commitlint/config-conventional": "19.2.2",
+    "@commitlint/cli": "19.4.1",
+    "@commitlint/config-conventional": "19.4.1",
     "@piro0919/next-unused": "0.2.2",
     "@total-typescript/ts-reset": "0.6.0",
     "@types/node": "^20",
@@ -59,7 +59,7 @@
     "depcheck": "1.4.7",
     "eslint": "^8",
     "eslint-config-google": "0.14.0",
-    "eslint-config-next": "14.2.6",
+    "eslint-config-next": "14.2.7",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-css-modules": "2.12.0",
     "eslint-plugin-ext": "0.1.0",
