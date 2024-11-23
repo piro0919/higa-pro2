@@ -10,7 +10,7 @@
     "framer-motion": "11.11.17",
     "hamburger-react": "2.5.1",
     "html-react-parser": "5.1.18",
-    "i18next": "23.16.8",
+    "i18next": "24.0.0",
     "microcms-ts-sdk": "1.2.0",
     "next": "15.0.3",
     "next-nprogress-bar": "2.3.15",
