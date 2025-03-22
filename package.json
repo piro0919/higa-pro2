@@ -12,7 +12,7 @@
     "html-react-parser": "5.2.2",
     "i18next": "24.2.3",
     "microcms-ts-sdk": "1.2.0",
-    "next": "15.2.2",
+    "next": "15.2.3",
     "next-nprogress-bar": "2.4.7",
     "nodemailer": "6.10.0",
     "overlayscrollbars-react": "0.5.6",
