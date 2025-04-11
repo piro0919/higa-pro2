@@ -57,7 +57,7 @@
     "@uphold/commitlint-config": "1.1.1",
     "commitlint-plugin-tense": "1.0.6",
     "depcheck": "1.4.7",
-    "eslint": "^8",
+    "eslint": "^9.0.0",
     "eslint-config-google": "0.14.0",
     "eslint-config-next": "15.3.0",
     "eslint-config-prettier": "10.1.2",
@@ -90,7 +90,7 @@
   "name": "higa-pro2",
   "overrides": {
     "eslint-plugin-unused-imports": {
-      "eslint": "^8"
+      "eslint": "^9.0.0"
     },
     "stylelint-css-modules-no-global-scoped-selector": {
       "stylelint": "16.18.0"
