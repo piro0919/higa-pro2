@@ -93,7 +93,7 @@
       "eslint": "^8"
     },
     "stylelint-css-modules-no-global-scoped-selector": {
-      "stylelint": "16.19.1"
+      "stylelint": "16.20.0"
     }
   },
   "private": true,
