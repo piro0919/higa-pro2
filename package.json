@@ -7,7 +7,7 @@
     "@t3-oss/env-nextjs": "0.13.10",
     "dayjs": "1.11.19",
     "fast-shuffle": "6.1.1",
-    "framer-motion": "12.25.0",
+    "framer-motion": "12.26.2",
     "hamburger-react": "2.5.2",
     "html-react-parser": "5.2.11",
     "i18next": "25.7.4",
@@ -22,9 +22,9 @@
     "react-circular-progressbar": "2.2.0",
     "react-collapsed": "4.2.0",
     "react-dom": "^19.0.0",
-    "react-hook-form": "7.71.0",
+    "react-hook-form": "7.71.1",
     "react-icons": "5.5.0",
-    "react-intersection-observer": "10.0.0",
+    "react-intersection-observer": "10.0.2",
     "react-modern-drawer": "1.4.0",
     "react-scroll": "1.9.3",
     "react-social-icons": "6.25.0",
@@ -39,7 +39,7 @@
     "usehooks-ts": "3.1.1",
     "zod": "4.3.5",
     "zod-i18n-map": "2.27.0",
-    "zustand": "5.0.9"
+    "zustand": "5.0.10"
   },
   "devDependencies": {
     "@commitlint/cli": "20.3.1",
